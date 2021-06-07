@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +21,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.whatthatmeans20.R
+import com.example.whatthatmeans20.analysis.TextAnalyzer
 import com.example.whatthatmeans20.databinding.FragmentScanBinding
+import com.example.whatthatmeans20.utils.Resources
 import java.lang.Exception
 import java.nio.ByteBuffer
 import java.util.concurrent.ExecutorService
@@ -70,16 +73,23 @@ class ScanFragment : Fragment() {
             val cameraProvider = cameraProviderFuture.get()
 
             val preview = Preview.Builder()
+                .setTargetResolution(Size(24, 24))
                 .build()
                 .apply {
                     setSurfaceProvider(binding.viewFinder.surfaceProvider)
                 }
 
             val imageAnalyzer = ImageAnalysis.Builder()
+                .setTargetResolution(Size(24, 24))
                 .build()
                 .apply {
-                    setAnalyzer(cameraExecutor, LuminousAnalyzer {
-                        Log.d("ScanFragment", "Average luminosity: $it")
+                    setAnalyzer(cameraExecutor, TextAnalyzer {
+                        Log.d("ScanFragmentResult", "The value is: $it")
+                        when(it) {
+                            is Resources.Success -> {
+                                Log.d("SuccessAnalysis", "The value is: ${it.data.text}")
+                            }
+                        }
                     })
                 }
 
@@ -126,26 +136,5 @@ class ScanFragment : Fragment() {
         super.onDestroyView()
         cameraExecutor.shutdown()
         _binding = null
-    }
-
-    private class LuminousAnalyzer(private val listener: (Double) -> Unit) : ImageAnalysis.Analyzer {
-        private fun ByteBuffer.toByteArray() : ByteArray {
-            rewind()
-            val data = ByteArray(remaining())
-            get(data)
-            return data
-        }
-
-
-        override fun analyze(image: ImageProxy) {
-            val buffer = image.planes[0].buffer
-            val data = buffer.toByteArray()
-            val pixels = data.map { it.toInt() and 0xFF }
-            val luma = pixels.average()
-
-            listener.invoke(luma)
-
-            image.close()
-        }
     }
 }

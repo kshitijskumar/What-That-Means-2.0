@@ -77,4 +77,7 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
     // CameraX View class
     implementation "androidx.camera:camera-view:1.0.0-alpha25"
+
+    //firebase ml kit
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:16.2.0'
 }

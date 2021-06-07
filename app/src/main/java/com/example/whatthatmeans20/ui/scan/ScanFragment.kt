@@ -13,7 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
@@ -25,7 +24,6 @@ import com.example.whatthatmeans20.analysis.TextAnalyzer
 import com.example.whatthatmeans20.databinding.FragmentScanBinding
 import com.example.whatthatmeans20.utils.Resources
 import java.lang.Exception
-import java.nio.ByteBuffer
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -36,13 +34,15 @@ class ScanFragment : Fragment() {
 
     private lateinit var cameraExecutor: ExecutorService
 
-    private val cameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        if(it) {
-            startCamera()
-        }else {
-            Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_LONG).show()
+    private val cameraPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (it) {
+                startCamera()
+            } else {
+                Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_LONG)
+                    .show()
+            }
         }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,29 +69,12 @@ class ScanFragment : Fragment() {
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-        cameraProviderFuture.addListener( {
+        cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
 
-            val preview = Preview.Builder()
-                .setTargetResolution(Size(24, 24))
-                .build()
-                .apply {
-                    setSurfaceProvider(binding.viewFinder.surfaceProvider)
-                }
+            val preview = getPreview()
 
-            val imageAnalyzer = ImageAnalysis.Builder()
-                .setTargetResolution(Size(24, 24))
-                .build()
-                .apply {
-                    setAnalyzer(cameraExecutor, TextAnalyzer {
-                        Log.d("ScanFragmentResult", "The value is: $it")
-                        when(it) {
-                            is Resources.Success -> {
-                                Log.d("SuccessAnalysis", "The value is: ${it.data.text}")
-                            }
-                        }
-                    })
-                }
+            val imageAnalyzer = getImageAnalyzer()
 
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
@@ -100,11 +83,32 @@ class ScanFragment : Fragment() {
                 cameraProvider.bindToLifecycle(
                     viewLifecycleOwner, cameraSelector, preview, imageAnalyzer
                 )
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 Log.d("MainActivity", "StartCamera, use case binding failed ${e.message}")
             }
         }, ContextCompat.getMainExecutor(requireContext()))
     }
+
+    private fun getPreview() = Preview.Builder()
+        .setTargetResolution(Size(48, 48))
+        .build()
+        .apply {
+            setSurfaceProvider(binding.viewFinder.surfaceProvider)
+        }
+
+    private fun getImageAnalyzer() = ImageAnalysis.Builder()
+        .setTargetResolution(Size(48, 48))
+        .build()
+        .apply {
+            setAnalyzer(cameraExecutor, TextAnalyzer {
+                Log.d("ScanFragmentResult", "The value is: $it")
+                when (it) {
+                    is Resources.Success -> {
+                        Log.d("SuccessAnalysis", "The value is: ${it.data.text}")
+                    }
+                }
+            })
+        }
 
     private fun requestPermission() {
 
@@ -114,7 +118,10 @@ class ScanFragment : Fragment() {
         ) == PackageManager.PERMISSION_GRANTED
         when {
             hasCamPermission -> startCamera()
-            ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.CAMERA) -> {
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(),
+                Manifest.permission.CAMERA
+            ) -> {
                 AlertDialog.Builder(requireContext())
                     .setTitle(getString(R.string.perm_rationale_title))
                     .setMessage(getString(R.string.reason_for_camera_perm))

@@ -11,6 +11,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
@@ -20,13 +22,16 @@ import androidx.navigation.fragment.findNavController
 import com.example.whatthatmeans20.R
 import com.example.whatthatmeans20.databinding.FragmentScanBinding
 import java.lang.Exception
+import java.nio.ByteBuffer
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class ScanFragment : Fragment() {
 
     private var _binding: FragmentScanBinding? = null
     private val binding: FragmentScanBinding get() = _binding!!
 
-    //we removed executors for time being.
+    private lateinit var cameraExecutor: ExecutorService
 
     private val cameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         if(it) {
@@ -49,7 +54,7 @@ class ScanFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         requestPermission()
-
+        cameraExecutor = Executors.newSingleThreadExecutor()
         setupViews()
     }
 
@@ -70,12 +75,20 @@ class ScanFragment : Fragment() {
                     setSurfaceProvider(binding.viewFinder.surfaceProvider)
                 }
 
+            val imageAnalyzer = ImageAnalysis.Builder()
+                .build()
+                .apply {
+                    setAnalyzer(cameraExecutor, LuminousAnalyzer {
+                        Log.d("ScanFragment", "Average luminosity: $it")
+                    })
+                }
+
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(
-                    viewLifecycleOwner, cameraSelector, preview
+                    viewLifecycleOwner, cameraSelector, preview, imageAnalyzer
                 )
             }catch (e: Exception) {
                 Log.d("MainActivity", "StartCamera, use case binding failed ${e.message}")
@@ -111,6 +124,28 @@ class ScanFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        cameraExecutor.shutdown()
         _binding = null
+    }
+
+    private class LuminousAnalyzer(private val listener: (Double) -> Unit) : ImageAnalysis.Analyzer {
+        private fun ByteBuffer.toByteArray() : ByteArray {
+            rewind()
+            val data = ByteArray(remaining())
+            get(data)
+            return data
+        }
+
+
+        override fun analyze(image: ImageProxy) {
+            val buffer = image.planes[0].buffer
+            val data = buffer.toByteArray()
+            val pixels = data.map { it.toInt() and 0xFF }
+            val luma = pixels.average()
+
+            listener.invoke(luma)
+
+            image.close()
+        }
     }
 }

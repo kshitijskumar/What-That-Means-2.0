@@ -3,6 +3,7 @@ package com.example.whatthatmeans20.ui.scan
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.util.Size
 import android.view.LayoutInflater
@@ -23,6 +24,10 @@ import com.example.whatthatmeans20.R
 import com.example.whatthatmeans20.analysis.TextAnalyzer
 import com.example.whatthatmeans20.databinding.FragmentScanBinding
 import com.example.whatthatmeans20.utils.Resources
+import com.example.whatthatmeans20.utils.UtilFunctions.handleScanResult
+import com.example.whatthatmeans20.utils.UtilFunctions.showToast
+import com.example.whatthatmeans20.utils.UtilFunctions.wordsListToString
+import com.example.whatthatmeans20.viewmodel.MainViewModel
 import java.lang.Exception
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -31,6 +36,10 @@ class ScanFragment : Fragment() {
 
     private var _binding: FragmentScanBinding? = null
     private val binding: FragmentScanBinding get() = _binding!!
+
+    private val viewModel by lazy {
+        MainViewModel.getMainViewModel(requireActivity())
+    }
 
     private lateinit var cameraExecutor: ExecutorService
 
@@ -59,9 +68,11 @@ class ScanFragment : Fragment() {
         requestPermission()
         cameraExecutor = Executors.newSingleThreadExecutor()
         setupViews()
+        observeValues()
     }
 
     private fun setupViews() {
+        binding.tvWordsScanned.movementMethod = ScrollingMovementMethod()
         binding.btnMove.setOnClickListener {
             findNavController().navigate(R.id.action_scanFragment_to_wordsFragment)
         }
@@ -101,14 +112,29 @@ class ScanFragment : Fragment() {
         .build()
         .apply {
             setAnalyzer(cameraExecutor, TextAnalyzer {
-                Log.d("ScanFragmentResult", "The value is: $it")
-                when (it) {
-                    is Resources.Success -> {
-                        Log.d("SuccessAnalysis", "The value is: ${it.data.text}")
-                    }
-                }
+                val resp = handleScanResult(it)
+                viewModel.updateWordsList(resp)
             })
         }
+
+    private fun observeValues() {
+        viewModel.wordsList.observe(viewLifecycleOwner) {
+            binding.tvScanning.visibility = when(it) {
+                is Resources.Error -> {
+                    requireContext().showToast(it.errorMsg)
+                    View.GONE
+                }
+                is Resources.Success -> {
+                    val wordsString = wordsListToString(it.data)
+                    binding.tvWordsScanned.text = wordsString
+                    View.GONE
+                }
+                is Resources.Loading -> {
+                    View.VISIBLE
+                }
+            }
+        }
+    }
 
     private fun requestPermission() {
 

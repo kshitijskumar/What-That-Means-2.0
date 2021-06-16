@@ -34,6 +34,7 @@ class TextAnalyzer(
             }
             lastAnalyzedTime = currentTimeStamp
         }else {
+            listener.invoke(Resources.Loading)
             image.close()
         }
 

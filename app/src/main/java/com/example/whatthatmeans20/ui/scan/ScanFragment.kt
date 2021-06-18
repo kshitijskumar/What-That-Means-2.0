@@ -24,11 +24,9 @@ import com.example.whatthatmeans20.R
 import com.example.whatthatmeans20.analysis.TextAnalyzer
 import com.example.whatthatmeans20.databinding.FragmentScanBinding
 import com.example.whatthatmeans20.utils.Resources
-import com.example.whatthatmeans20.utils.UtilFunctions.handleScanResult
 import com.example.whatthatmeans20.utils.UtilFunctions.showToast
 import com.example.whatthatmeans20.utils.UtilFunctions.wordsListToString
 import com.example.whatthatmeans20.viewmodel.MainViewModel
-import java.lang.Exception
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -65,10 +63,10 @@ class ScanFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        observeValues()
         requestPermission()
         cameraExecutor = Executors.newSingleThreadExecutor()
         setupViews()
-        observeValues()
     }
 
     private fun setupViews() {
@@ -112,25 +110,19 @@ class ScanFragment : Fragment() {
         .build()
         .apply {
             setAnalyzer(cameraExecutor, TextAnalyzer {
-                val resp = handleScanResult(it)
-                viewModel.updateWordsList(resp)
+                viewModel.getWordsListFromScannedText(it)
             })
         }
 
     private fun observeValues() {
         viewModel.wordsList.observe(viewLifecycleOwner) {
-            binding.tvScanning.visibility = when(it) {
+            when (it) {
                 is Resources.Error -> {
                     requireContext().showToast(it.errorMsg)
-                    View.GONE
                 }
                 is Resources.Success -> {
                     val wordsString = wordsListToString(it.data)
                     binding.tvWordsScanned.text = wordsString
-                    View.GONE
-                }
-                is Resources.Loading -> {
-                    View.VISIBLE
                 }
             }
         }

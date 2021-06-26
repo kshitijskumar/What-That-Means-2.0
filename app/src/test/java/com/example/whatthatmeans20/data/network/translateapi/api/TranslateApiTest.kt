@@ -1,5 +1,6 @@
 package com.example.whatthatmeans20.data.network.translateapi.api
 
+import android.util.Log
 import com.example.whatthatmeans20.data.network.translateapi.model.TranslateTextModel
 import com.example.whatthatmeans20.utils.Injector
 import kotlinx.coroutines.runBlocking

@@ -5,9 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.example.whatthatmeans20.R
 import com.example.whatthatmeans20.databinding.FragmentWordsBinding
 import com.example.whatthatmeans20.viewmodel.MainViewModel
 
@@ -41,6 +44,12 @@ class WordsFragment : Fragment() {
     private fun setupViews() {
         wordAdapter = ScannedWordsAdapter {
             Log.d("WordFragment", "Word clicked is: $it")
+            findNavController().navigate(
+                R.id.action_wordsFragment_to_meaningFragment,
+                bundleOf(
+                    WORD to it.word
+                )
+            )
         }
         binding.rvWords.apply {
             layoutManager = StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
@@ -57,5 +66,9 @@ class WordsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        const val WORD = "word"
     }
 }

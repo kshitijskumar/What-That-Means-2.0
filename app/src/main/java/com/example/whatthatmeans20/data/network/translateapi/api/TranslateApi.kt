@@ -1,11 +1,11 @@
 package com.example.whatthatmeans20.data.network.translateapi.api
 
+import com.example.whatthatmeans20.BuildConfig
 import com.example.whatthatmeans20.data.network.translateapi.model.TranslateTextModel
 import com.example.whatthatmeans20.data.network.translateapi.response.TranslateResponse
 import com.example.whatthatmeans20.utils.Constants.API_VERSION
 import com.example.whatthatmeans20.utils.Constants.TRANSLATE_API_BASE_URL
 import com.example.whatthatmeans20.utils.Constants.TRANSLATE_CONTENT_TYPE_HEADER
-import com.example.whatthatmeans20.utils.Constants.TRANSLATE_HOST_HEADER
 import com.example.whatthatmeans20.utils.Constants.TRANSLATE_KEY_HEADER
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -22,7 +22,7 @@ interface TranslateApi {
     @Headers(
         TRANSLATE_CONTENT_TYPE_HEADER,
         TRANSLATE_KEY_HEADER,
-        TRANSLATE_HOST_HEADER
+        BuildConfig.RAPID_API_KEY
     )
     @POST("translate?api-version=$API_VERSION&textType=plain&profanityAction=NoAction")
     suspend fun translateWordToEnglish(

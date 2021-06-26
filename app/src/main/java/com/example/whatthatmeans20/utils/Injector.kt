@@ -1,6 +1,7 @@
 package com.example.whatthatmeans20.utils
 
 import com.example.whatthatmeans20.data.network.translateapi.api.TranslateApi
+import com.example.whatthatmeans20.data.repository.TranslateRepository
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.TextRecognizerOptions
@@ -10,6 +11,8 @@ class Injector private constructor() {
 
     private var recognizer: TextRecognizer? = null
     private var translateApi: TranslateApi? = null
+
+    private var translateRepo: TranslateRepository? = null
 
     fun providesRecognizer() : TextRecognizer {
         if(recognizer == null) {
@@ -25,6 +28,13 @@ class Injector private constructor() {
         }
 
         return translateApi!!
+    }
+
+    fun providesTranslateRepository(): TranslateRepository {
+        if(translateRepo == null) {
+            translateRepo = TranslateRepository()
+        }
+        return translateRepo!!
     }
 
 

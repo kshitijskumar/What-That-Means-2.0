@@ -7,4 +7,7 @@ object Constants {
     const val API_VERSION = "3.0"
     const val TRANSLATE_CONTENT_TYPE_HEADER = "content-type: application/json"
     const val TRANSLATE_KEY_HEADER = "x-rapidapi-host: microsoft-translator-text.p.rapidapi.com"
+
+    //meaning api
+    const val MEANING_API_BASE_URL = "https://api.dictionaryapi.dev/api/v2/entries/en_GB/"
 }

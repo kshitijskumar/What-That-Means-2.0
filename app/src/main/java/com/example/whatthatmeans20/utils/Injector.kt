@@ -1,5 +1,6 @@
 package com.example.whatthatmeans20.utils
 
+import com.example.whatthatmeans20.data.network.meaningapi.api.MeaningApi
 import com.example.whatthatmeans20.data.network.translateapi.api.TranslateApi
 import com.example.whatthatmeans20.data.repository.TranslateRepository
 import com.google.mlkit.vision.text.TextRecognition
@@ -11,6 +12,7 @@ class Injector private constructor() {
 
     private var recognizer: TextRecognizer? = null
     private var translateApi: TranslateApi? = null
+    private var meaningApi: MeaningApi? = null
 
     private var translateRepo: TranslateRepository? = null
 
@@ -35,6 +37,13 @@ class Injector private constructor() {
             translateRepo = TranslateRepository()
         }
         return translateRepo!!
+    }
+
+    fun providesMeaningApi(): MeaningApi {
+        if(meaningApi == null) {
+            meaningApi = MeaningApi.createMeaningApi()
+        }
+        return meaningApi!!
     }
 
 

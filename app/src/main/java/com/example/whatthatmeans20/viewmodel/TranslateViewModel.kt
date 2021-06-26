@@ -15,7 +15,7 @@ class TranslateViewModel(
 
 
     fun getWordMeaning(word: String) = viewModelScope.launch {
-        val res = repo.translateWord(word)
+        val res = repo.getMeaning(word)
         Log.d("TranslateViewModel", "$res")
     }
 

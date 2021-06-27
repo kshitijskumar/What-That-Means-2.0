@@ -2,4 +2,5 @@
     <string name="app_name">What That Means 2.0</string>
     <string name="reason_for_camera_perm">In order for us to function properly, we need your camera to scan the text, that is why we are requesting you to grant us permission.</string>
     <string name="perm_rationale_title">Why we need your camera permission?</string>
+    <string name="definitions">Definition</string>
 </resources>

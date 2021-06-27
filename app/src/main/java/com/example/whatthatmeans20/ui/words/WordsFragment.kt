@@ -47,7 +47,8 @@ class WordsFragment : Fragment() {
             findNavController().navigate(
                 R.id.action_wordsFragment_to_meaningFragment,
                 bundleOf(
-                    WORD to it.word
+                    WORD to it.word,
+                    LANGUAGE_CODE to it.language
                 )
             )
         }
@@ -70,5 +71,6 @@ class WordsFragment : Fragment() {
 
     companion object {
         const val WORD = "word"
+        const val LANGUAGE_CODE = "lang_code"
     }
 }

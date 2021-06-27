@@ -1,21 +1,25 @@
 package com.example.whatthatmeans20.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.example.whatthatmeans20.data.network.meaningapi.response.MeaningResponse
 import com.example.whatthatmeans20.data.repository.TranslateRepository
 import com.example.whatthatmeans20.utils.Injector
+import com.example.whatthatmeans20.utils.Resources
 import kotlinx.coroutines.launch
 
 class TranslateViewModel(
     private val repo: TranslateRepository
 ) : ViewModel() {
 
+    private val _meanings = MutableLiveData<Resources<MeaningResponse>>()
+    val meanings: LiveData<Resources<MeaningResponse>> get() = _meanings
 
     fun getWordMeaning(word: String) = viewModelScope.launch {
+        _meanings.postValue(Resources.Loading)
         val res = repo.getMeaning(word)
         Log.d("TranslateViewModel", "$res")
+        _meanings.postValue(res)
     }
 
 

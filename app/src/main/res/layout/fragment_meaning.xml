@@ -44,29 +44,25 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/meaningTabLayout"
-            android:layout_width="0dp"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:layout_marginEnd="14dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@drawable/bg_tab_layout"
             app:layout_constraintStart_toStartOf="@id/tvPhonetics"
             app:layout_constraintTop_toBottomOf="@id/tvPhonetics"
-            app:tabGravity="fill" />
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            app:layout_constraintStart_toStartOf="@id/meaningTabLayout"
-            app:layout_constraintEnd_toEndOf="@id/meaningTabLayout"
-            app:layout_constraintTop_toBottomOf="@id/meaningTabLayout"
-            android:background="@color/gray"/>
+            app:tabBackground="@drawable/bg_tab"
+            app:tabGravity="start"
+            app:tabIndicatorHeight="0dp"
+            app:tabSelectedTextColor="@color/white" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginEnd="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="14dp"
             app:layout_constraintStart_toStartOf="@id/meaningTabLayout"
             app:layout_constraintTop_toBottomOf="@id/meaningTabLayout" />
 

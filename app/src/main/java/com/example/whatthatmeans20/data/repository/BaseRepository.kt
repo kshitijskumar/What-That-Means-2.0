@@ -15,7 +15,7 @@ abstract class BaseRepository {
                 val resp = call.invoke()
                 when (resp.code()) {
                     200 -> {
-                        if (resp.body() == null) Resources.Error("Call succesfull but empty response")
+                        if (resp.body() == null) Resources.Error("Call successful but empty response")
                         else Resources.Success(resp.body()!!)
                     }
                     else -> {

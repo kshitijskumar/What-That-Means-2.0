@@ -18,10 +18,14 @@
         android:label="WordsFragment" >
         <action
             android:id="@+id/action_wordsFragment_to_meaningFragment"
-            app:destination="@id/meaningFragment" />
+            app:destination="@id/meaningDestination" />
     </fragment>
-    <fragment
-        android:id="@+id/meaningFragment"
-        android:name="com.example.whatthatmeans20.ui.MeaningFragment"
-        android:label="MeaningFragment" />
+
+    <navigation android:id="@+id/meaningDestination"
+        app:startDestination="@id/meaningFragment">
+        <fragment
+            android:id="@+id/meaningFragment"
+            android:name="com.example.whatthatmeans20.ui.meaning.MeaningFragment"
+            android:label="MeaningFragment" />
+    </navigation>
 </navigation>

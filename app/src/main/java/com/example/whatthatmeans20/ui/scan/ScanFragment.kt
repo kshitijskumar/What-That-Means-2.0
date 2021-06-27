@@ -99,7 +99,6 @@ class ScanFragment : Fragment() {
     }
 
     private fun getPreview() = Preview.Builder()
-        .setTargetResolution(Size(48, 48))
         .build()
         .apply {
             setSurfaceProvider(binding.viewFinder.surfaceProvider)

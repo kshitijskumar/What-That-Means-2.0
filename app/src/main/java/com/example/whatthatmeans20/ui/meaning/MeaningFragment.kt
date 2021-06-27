@@ -1,10 +1,12 @@
-package com.example.whatthatmeans20.ui
+package com.example.whatthatmeans20.ui.meaning
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.navGraphViewModels
+import com.example.whatthatmeans20.R
 import com.example.whatthatmeans20.databinding.FragmentMeaningBinding
 import com.example.whatthatmeans20.ui.words.WordsFragment.Companion.WORD
 import com.example.whatthatmeans20.viewmodel.TranslateViewModel
@@ -14,11 +16,9 @@ class MeaningFragment : Fragment() {
     private var _binding: FragmentMeaningBinding? = null
     private val binding: FragmentMeaningBinding get() = _binding!!
 
-    private val viewModel by lazy {
-        TranslateViewModel.provideTranslateViewModel(this)
+    private val viewModel by navGraphViewModels<TranslateViewModel>(R.id.meaningDestination) {
+        TranslateViewModel.provideTranslateViewModelFactory()
     }
-
-    private var textToSearch: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,

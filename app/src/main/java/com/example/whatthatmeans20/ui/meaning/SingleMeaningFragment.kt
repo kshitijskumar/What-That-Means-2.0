@@ -61,7 +61,7 @@ class SingleMeaningFragment : Fragment() {
         binding.tvExample.text = definition.example
         binding.tvSynonyms.text = conditionToResponse(
             definition.synonyms.isEmpty(),
-            "No relevant synonyms found.",
+            "---No relevant synonyms found---",
             stringListToString(definition.synonyms)
         )
     }

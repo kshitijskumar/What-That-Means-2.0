@@ -1,7 +1,6 @@
 package com.example.whatthatmeans20.ui.meaning
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +13,11 @@ import com.example.whatthatmeans20.databinding.FragmentMeaningBinding
 import com.example.whatthatmeans20.ui.words.WordsFragment.Companion.LANGUAGE_CODE
 import com.example.whatthatmeans20.ui.words.WordsFragment.Companion.WORD
 import com.example.whatthatmeans20.utils.Resources
-import com.example.whatthatmeans20.utils.UtilFunctions.conditionToResponse
+import com.example.whatthatmeans20.utils.UtilFunctions.showToast
 import com.example.whatthatmeans20.utils.UtilFunctions.stringListToString
 import com.example.whatthatmeans20.viewmodel.TranslateViewModel
 import com.google.android.material.tabs.TabLayoutMediator
+import java.util.logging.ErrorManager
 
 class MeaningFragment : Fragment() {
 
@@ -70,13 +70,24 @@ class MeaningFragment : Fragment() {
 
     private fun observeValues() {
         viewModel.meanings.observe(viewLifecycleOwner) {
-            when (it) {
+           binding.progressBar.visibility = when (it) {
                 is Resources.Success -> {
                     binding.tvWord.text = arguments?.getString(WORD)
                     binding.tvLanguageCode.text = arguments?.getString(LANGUAGE_CODE)
                     setupViewPager(it.data[0].meanings.size)
                     handlePhoneticsText(it.data[0].phonetics)
+                    View.GONE
                 }
+                is Resources.Loading -> {
+                    View.VISIBLE
+                }
+               is Resources.Error -> {
+                   binding.tvErrorMsg.apply {
+                       text = it.errorMsg
+                       visibility = View.VISIBLE
+                   }
+                   View.GONE
+               }
             }
         }
     }

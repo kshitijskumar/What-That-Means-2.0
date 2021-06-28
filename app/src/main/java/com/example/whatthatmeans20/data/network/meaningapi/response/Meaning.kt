@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Meaning(
     @SerializedName("definitions")
-    var definitions: List<Definition>,
+    var definitions: List<Definition> = listOf(),
     @SerializedName("partOfSpeech")
-    var partOfSpeech: String
+    var partOfSpeech: String? = null
 )

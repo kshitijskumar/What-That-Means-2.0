@@ -5,9 +5,9 @@ import com.google.gson.annotations.SerializedName
 
 data class Definition(
     @SerializedName("definition")
-    var definition: String,
+    var definition: String = "Sorry, we didn't find any relevant definition.",
     @SerializedName("example")
-    var example: String,
+    var example: String = "No relevant example found",
     @SerializedName("synonyms")
-    var synonyms: List<String>
+    var synonyms: List<String> = listOf()
 )

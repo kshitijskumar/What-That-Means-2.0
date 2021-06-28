@@ -27,6 +27,7 @@ class TextAnalyzer(
             listener.invoke(Resources.Loading)
             val mediaImage = image.image
             if(mediaImage != null) {
+                Log.d("ImageRotation", "Rotations: ${image.imageInfo.rotationDegrees}")
                 val analysisImage = InputImage.fromMediaImage(mediaImage, image.imageInfo.rotationDegrees)
                 extractTextFromImages(analysisImage) {
                     image.close()

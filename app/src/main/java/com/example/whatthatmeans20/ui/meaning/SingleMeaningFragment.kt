@@ -12,6 +12,8 @@ import com.example.whatthatmeans20.R
 import com.example.whatthatmeans20.data.network.meaningapi.response.Meaning
 import com.example.whatthatmeans20.databinding.FragmentSingleMeaningBinding
 import com.example.whatthatmeans20.utils.Resources
+import com.example.whatthatmeans20.utils.UtilFunctions.conditionToResponse
+import com.example.whatthatmeans20.utils.UtilFunctions.stringListToString
 import com.example.whatthatmeans20.viewmodel.TranslateViewModel
 
 class SingleMeaningFragment : Fragment() {
@@ -44,7 +46,7 @@ class SingleMeaningFragment : Fragment() {
 
     private fun observeValues() {
         viewModel.meanings.observe(viewLifecycleOwner) {
-            when(it) {
+            when (it) {
                 is Resources.Success -> {
                     displayInformation(it.data[0].meanings[meaningIndex])
                 }
@@ -53,10 +55,15 @@ class SingleMeaningFragment : Fragment() {
     }
 
     private fun displayInformation(meaning: Meaning) {
-        if(meaning.definitions.isEmpty()) return
+        if (meaning.definitions.isEmpty()) return
         val definition = meaning.definitions[0]
         binding.tvDefinition.text = definition.definition
         binding.tvExample.text = definition.example
+        binding.tvSynonyms.text = conditionToResponse(
+            definition.synonyms.isEmpty(),
+            "No relevant synonyms found.",
+            stringListToString(definition.synonyms)
+        )
     }
 
 
@@ -68,7 +75,7 @@ class SingleMeaningFragment : Fragment() {
     companion object {
         private const val MEANING_INDEX = "meaning_index"
 
-        fun getFragmentInstance(index: Int) : SingleMeaningFragment {
+        fun getFragmentInstance(index: Int): SingleMeaningFragment {
             val fragment = SingleMeaningFragment()
             fragment.arguments = bundleOf(
                 MEANING_INDEX to index

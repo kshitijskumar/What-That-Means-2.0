@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import com.example.whatthatmeans20.data.model.WordModel
 import com.google.mlkit.vision.text.Text
+import java.util.concurrent.locks.Condition
 
 
 object UtilFunctions {
@@ -52,5 +53,25 @@ object UtilFunctions {
         }
 
         return result.toString()
+    }
+
+    fun stringListToString(words: List<String>) : String {
+        val result = StringBuilder()
+        words.forEach {
+            result.append("$it, ")
+        }
+        return if(result.isNotEmpty()) {
+            result.substring(0, result.length-2)
+        }else {
+            result.toString()
+        }
+    }
+
+    fun conditionToResponse(condition: Boolean, trueCase: String, falseCase: String) : String {
+        return if (condition) {
+            trueCase
+        }else {
+            falseCase
+        }
     }
 }

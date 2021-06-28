@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Phonetic(
     @SerializedName("audio")
-    var audio: String,
+    var audio: String? = null,
     @SerializedName("text")
-    var text: String
+    var text: String? = null
 )

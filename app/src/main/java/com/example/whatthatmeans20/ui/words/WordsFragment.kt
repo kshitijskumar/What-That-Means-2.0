@@ -60,6 +60,7 @@ class WordsFragment : Fragment() {
 
     private fun observeValues() {
         viewModel.words.observe(viewLifecycleOwner) {
+            binding.tvNoWords.visibility = if(it.isEmpty()) View.VISIBLE else View.GONE
             wordAdapter.submitList(it)
         }
     }

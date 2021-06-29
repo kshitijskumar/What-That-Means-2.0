@@ -1,14 +1,14 @@
 package com.example.whatthatmeans20.ui.scan
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.util.Size
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -83,7 +83,7 @@ class ScanFragment : Fragment() {
 
             val preview = getPreview()
 
-            val imageAnalyzer = getImageAnalyzer()
+            val imageAnalyzer = getScanImageAnalyzer()
 
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
@@ -104,7 +104,7 @@ class ScanFragment : Fragment() {
             setSurfaceProvider(binding.viewFinder.surfaceProvider)
         }
 
-    private fun getImageAnalyzer() = ImageAnalysis.Builder()
+    private fun getScanImageAnalyzer() = ImageAnalysis.Builder()
         .setTargetResolution(Size(48, 48))
         .build()
         .apply {
@@ -154,7 +154,6 @@ class ScanFragment : Fragment() {
         }
 
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

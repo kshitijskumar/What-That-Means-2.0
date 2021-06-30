@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.navGraphViewModels
 import com.example.whatthatmeans20.R
 import com.example.whatthatmeans20.data.network.meaningapi.response.MeaningResponse
@@ -29,6 +28,9 @@ class MeaningFragment : Fragment(), MediaPlayer.OnPreparedListener {
     private lateinit var meaningAdapter: MeaningViewpagerAdapter
 
     private var mediaPlayer: MediaPlayer? = null
+
+    private var isPrepared = false
+    private var isAudioPending = false
 
     private val viewModel by navGraphViewModels<TranslateViewModel>(R.id.meaningDestination) {
         TranslateViewModel.provideTranslateViewModelFactory()
@@ -54,17 +56,17 @@ class MeaningFragment : Fragment(), MediaPlayer.OnPreparedListener {
     private fun createMediaPlayer() {
         mediaPlayer = MediaPlayer()
         binding.btnSpeaker.setOnClickListener {
-            if (viewModel.meanings.value is Resources.Success) {
-                val audioUrl =
-                    (viewModel.meanings.value as Resources.Success<MeaningResponse>).data[0].phonetics[0].audio
-                audioUrl?.let { url ->
-                    playPhoneticAudio(url)
-                }
+            if(isPrepared) {
+                mediaPlayer?.start()
+            }else {
+                isAudioPending = true
+                requireContext().showToast("Please wait while we load the audio.")
             }
         }
     }
 
     private fun searchMeaning() {
+        if(viewModel.meanings.value is Resources.Success) return
         val word = arguments?.getString(WORD) ?: "Hello"
         viewModel.getWordMeaning(word)
     }
@@ -94,6 +96,7 @@ class MeaningFragment : Fragment(), MediaPlayer.OnPreparedListener {
                     setupViewPager(it.data[0].meanings.size)
                     handlePhoneticsText(it.data[0].phonetics)
                     handlePhoneticAudio(it.data[0].phonetics)
+                    playPhoneticAudio(it.data[0].phonetics)
                     View.GONE
                 }
                 is Resources.Loading -> {
@@ -136,14 +139,13 @@ class MeaningFragment : Fragment(), MediaPlayer.OnPreparedListener {
         }
     }
 
-    private fun playPhoneticAudio(audioUrl: String) {
+    private fun playPhoneticAudio(phonetics: List<Phonetic>) {
+        if(phonetics.isNullOrEmpty()) return
+        val audioUrl = phonetics[0].audio ?: return
         try {
             mediaPlayer?.setDataSource(audioUrl)
             mediaPlayer?.prepareAsync()
             mediaPlayer?.setOnPreparedListener(this)
-            mediaPlayer?.setOnCompletionListener {
-                mediaPlayer?.reset()
-            }
         } catch (e: Exception) {
             e.printStackTrace()
             requireContext().showToast("Audio cannot be played.")
@@ -151,7 +153,11 @@ class MeaningFragment : Fragment(), MediaPlayer.OnPreparedListener {
     }
 
     override fun onPrepared(mp: MediaPlayer?) {
-        mp?.start()
+        isPrepared = true
+        if(isAudioPending) {
+            mp?.start()
+            isAudioPending = false
+        }
     }
 
     override fun onDestroyView() {
